@@ -15,11 +15,13 @@ class Container
 protected:
     block *content;
     uint len;
+    bool initialized;
 
 public:
-    Container(uint, bool);
+    Container();
     ~Container();
 
+    void init(uint, bool);
     void Clear();
     void Randomize();
     void Load(block *);
@@ -35,23 +37,31 @@ public:
     Container operator^(const Container &);
     Container operator~();
     bool operator[](uint);
+    void operator=(const Container &);
 };
 
-Container::Container(uint len, bool initRand = false)
+Container::Container()
 {
-    this->len = len;
-    this->content = new block[len];
-    initRand ? Randomize() : Clear();
+    this->initialized = false;
 }
 
 Container::~Container()
 {
-    delete this->content;
+    delete[] this->content;
 }
 
 void Container::Clear()
 {
     memset(this->content, 0, this->len);
+}
+
+void Container::init(uint len, bool initRand = false)
+{
+    this->len = len;
+    this->content = new block[len];
+    initRand ? Randomize() : Clear();
+
+    this->initialized = true;
 }
 
 void Container::Randomize()
@@ -105,7 +115,9 @@ uint Container::Popcnt()
 
 Container Container::operator&(const Container &other)
 {
-    Container container(this->len);
+    Container container;
+    container.init(this->len);
+
     for (int i = 0; i < this->len; i++)
     {
         container.WriteBlock(i, this->content[i] && other.content[i]);
@@ -115,7 +127,9 @@ Container Container::operator&(const Container &other)
 
 Container Container::operator|(const Container &other)
 {
-    Container container(this->len);
+    Container container;
+    container.init(this->len);
+
     for (int i = 0; i < this->len; i++)
     {
         container.WriteBlock(i, this->content[i] || other.content[i]);
@@ -125,7 +139,8 @@ Container Container::operator|(const Container &other)
 
 Container Container::operator~()
 {
-    Container container(this->len);
+    Container container;
+    container.init(this->len);
     for (int i = 0; i < this->len; i++)
     {
         container.WriteBlock(i, ~this->content[i]);
@@ -135,7 +150,9 @@ Container Container::operator~()
 
 Container Container::operator^(const Container &other)
 {
-    Container container(this->len);
+    Container container;
+    container.init(this->len);
+
     for (int i = 0; i < this->len; i++)
     {
         container.WriteBlock(i, this->content[i] ^ other.content[i]);
@@ -148,18 +165,23 @@ bool Container::operator[](uint i)
     return this->content[i / size] & 1 << offset(i) % size;
 }
 
+void Container::operator=(const Container &other)
+{
+    memcpy(this->content,other.content,this->len);
+    this->len = other.len;
+}
+
 class Layer
 {
 protected:
     uint nIn, nOut;
     uint threshold;
-    Container **kernel;
+    Container *kernel;
 
 public:
     Layer(uint, uint, bool);
-    ~Layer();
 
-    Container Forward(Container);
+    Container Forward(Container &);
 };
 
 Layer::Layer(uint nIn, uint nOut, bool initRand = true)
@@ -167,27 +189,23 @@ Layer::Layer(uint nIn, uint nOut, bool initRand = true)
     this->nIn = nIn;
     this->nOut = nOut;
     this->threshold = size * nIn / 2;
-    this->kernel = new Container*[nOut*size];
+    this->kernel = new Container[nOut * size];
 
     for (int i = 0; i < size * nOut; i++)
     {
-        this->kernel[i] = new Container(nIn, initRand);
+        this->kernel[i].init(nIn, initRand);
     }
 }
 
-Layer::~Layer()
+Container Layer::Forward(Container &x)
 {
-    free(this->kernel);
-}
-
-Container Layer::Forward(Container x)
-{
-    Container res(this->nOut);
+    Container container;
+    container.init(this->nOut);
     for (int i = 0; i < size * this->nOut; i++)
     {
-        res.WriteEmptyBit(i, (x ^ *this->kernel[i]).Popcnt() > threshold);
+        container.WriteEmptyBit(i, (x ^ this->kernel[i]).Popcnt() > threshold);
     }
-    return res;
+    return container;
 }
 
 int main()
@@ -195,8 +213,11 @@ int main()
     time_t t;
     srand((uint)time(&t));
 
-    Container x(10,true);
-    Layer layer(10, 10);
-    Container y = layer.Forward(x);
+    Container x,y;
+    x.init(1000, true);
+    y.init(1000);
+    Layer layer(1000, 1000);
+    y = layer.Forward(x);
+
     return 1;
 }
