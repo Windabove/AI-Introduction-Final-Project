@@ -6,12 +6,12 @@ using namespace std;
 class Model{
     protected:
     uint port;
-    vector<Layer> layers;
+    vector<Layer*> layers;
 
     public:
     Model();
     ~Model();
 
-    Model& pushLayer(const Layer& layer);
-    Container forward(const Container &)noexcept;
+    Model& operator<<(Layer& layer);
+    Container forward(const Container&)noexcept;
 };

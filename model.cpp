@@ -9,21 +9,22 @@ Model::~Model()
     layers.clear();
 }
 
-Model &Model::pushLayer(const Layer& layer)
+Model& Model::operator<<(Layer& layer)
 {
     if (port == layer.nIn||layers.size()==0)
     {
-        layers.push_back(layer);
+        layers.push_back(&layer);
         port = layer.nOut;
-        return *this;
+    }else if(port != layer.nIn){
+        throw("Invalid port");
     }
 }
 
-Container Model::forward(const Container &x)noexcept
+Container Model::forward(const Container& x)noexcept
 {
-    Container y = x;
+    Container y(x);
     for (auto l:layers){
-        y = l.forward(y);
+        y = l->forward(y);
     }
     return y;
 }

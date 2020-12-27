@@ -13,8 +13,6 @@ Layer::Layer(uint _nIn, uint _nOut) : nIn(_nIn), nOut(_nOut)
     }
 }
 
-Layer::Layer(const Layer &l){}
-
 Layer::~Layer()
 {
     if (kernel)

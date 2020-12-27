@@ -14,7 +14,6 @@ protected:
 public:
     Layer();
     Layer(uint, uint);
-    Layer(const Layer&);
     ~Layer();
 
     Container forward(const Container &);
