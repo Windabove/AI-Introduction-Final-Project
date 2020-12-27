@@ -1,6 +1,7 @@
 #pragma once
 #include "container.h"
 
+class Model;
 class Layer
 {
 protected:
@@ -8,8 +9,13 @@ protected:
     uint threshold;
     Container *kernel;
 
+    friend Model;
+
 public:
+    Layer();
     Layer(uint, uint);
+    Layer(const Layer&);
+    ~Layer();
 
     Container forward(const Container &);
 };

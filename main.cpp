@@ -1,17 +1,19 @@
-#include "layer.h"
+#include "model.h"
 #include <time.h>
-
 using namespace std;
 
 int main()
 {
-    time_t t;
-    srand((uint)time(&t));
+    Model M;
+    Layer l1(2,4);
+    Layer l2(4,3);
+    Layer l3(3,2);
+    M.pushLayer(l1);
+    M.pushLayer(l2);
+    M.pushLayer(l3);
 
-    Layer l(10, 10);
     Container x(10);
     x.randomize();
-
-    Container y = l.forward(x);
+    auto y = M.forward(x);
     return 0;
 }

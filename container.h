@@ -4,7 +4,7 @@
 #include <string.h>
 #include <utility>
 
-#define size 32
+const int size = 32;
 typedef int block;
 
 class Layer;
@@ -20,8 +20,8 @@ protected:
 public:
     Container();
     Container(uint);
-    Container(Container &&);
-    Container(const Container &) = delete;
+    Container(const Container&);
+    Container(Container &&) noexcept;
     Container(block *&);
 
     ~Container();
@@ -40,8 +40,9 @@ public:
     Container operator^(const Container &);
 
     Container &operator~();
-    
+
     bool operator[](uint);
 
-    Container& operator()(uint);
+    Container &operator()(uint);
+    Container &operator=(Container &&) noexcept;
 };

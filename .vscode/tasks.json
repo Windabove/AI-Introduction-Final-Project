@@ -8,6 +8,7 @@
                 "-g",
                 "layer.cpp",
                 "container.cpp",
+                "model.cpp",
                 "main.cpp",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}"

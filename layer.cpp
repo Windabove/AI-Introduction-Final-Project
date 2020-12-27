@@ -1,5 +1,7 @@
 #include "layer.h"
 
+Layer::Layer(){}
+
 Layer::Layer(uint _nIn, uint _nOut) : nIn(_nIn), nOut(_nOut)
 {
     threshold = size * nIn / 2;
@@ -9,6 +11,14 @@ Layer::Layer(uint _nIn, uint _nOut) : nIn(_nIn), nOut(_nOut)
     {
         kernel[i](nIn).randomize();
     }
+}
+
+Layer::Layer(const Layer &l){}
+
+Layer::~Layer()
+{
+    if (kernel)
+        delete[] kernel;
 }
 
 Container Layer::forward(const Container &x)

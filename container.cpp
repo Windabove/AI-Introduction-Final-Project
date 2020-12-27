@@ -12,9 +12,11 @@ Container::Container(uint _len) : len(_len), content(new block[_len])
     clear();
 }
 
-Container::Container(Container &&c) : content(c.content)
+Container::Container(const Container&other):len(other.len),content(other.content){};
+
+Container::Container(Container &&other) noexcept : len(other.len),content(other.content)
 {
-    c.content = nullptr;
+    other.content = nullptr;
 }
 
 Container::Container(block *&b) : content(b) {}
@@ -115,5 +117,11 @@ Container &Container::operator()(uint _len)
     len = _len;
     content = new block[_len];
     clear();
+    return *this;
+}
+
+Container &Container::operator=(Container &&other) noexcept
+{
+    content = other.content;
     return *this;
 }
