@@ -2,29 +2,47 @@
 
 using namespace std;
 
-Model::Model(){}
+Model::Model() {}
 
 Model::~Model()
 {
     layers.clear();
 }
 
-Model& Model::operator<<(Layer& layer)
+Model &Model::operator<<(Layer &layer)
 {
-    if (port == layer.nIn||layers.size()==0)
+    if (layers.size() == 0)
     {
         layers.push_back(&layer);
-        port = layer.nOut;
-    }else if(port != layer.nIn){
-        throw("Invalid port");
+        portIn = layer.nIn;
+        portOut = layer.nOut;
+        return *this;
+    }
+    else if (portOut == layer.nIn)
+    {
+        layers.push_back(&layer);
+        portOut = layer.nOut;
+        return *this;
+    }
+    else if (portOut != layer.nIn)
+    {
+        throw "Invalid nIn";
     }
 }
 
-Container Model::forward(const Container& x)noexcept
+Container Model::forward(const Container &x)
 {
-    Container y(x);
-    for (auto l:layers){
-        y = l->forward(y);
+    if (x.len != portIn)
+    {
+        throw "Invalid length of input vector";
     }
-    return y;
+    else
+    {
+        Container tmp(x);
+        for (auto l : layers)
+        {
+            tmp = move(l->forward(tmp));
+        }
+        return tmp;
+    }
 }

@@ -6,14 +6,30 @@ using namespace std;
 
 int main()
 {
-    Model M;
-    Layer l1(2,4);
-    Layer l2(4,2);
-    
-    M<<l1<<l2;
+    try
+    {
+        Model M;
+        Layer l1(1000, 1000);
+        Layer l2(1000, 1000);
+        Layer l3(1000, 1000);
 
-    Container x(2);
-    x.randomize();
-    Container y = M.forward(x);
-    return 0;
+
+        M << l1 << l2 << l3;
+
+        Container x(1000);
+        x.randomize();
+
+        clock_t t0, t1;
+        t0 = clock();
+        Container y = M.forward(x);
+
+        t1 = clock();
+
+        cout << (t1 - t0) * 1000 / CLOCKS_PER_SEC << "ms" << endl;
+        return 0;
+    }
+    catch (const char *e)
+    {
+        cout << e << endl;
+    }
 }

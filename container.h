@@ -8,6 +8,7 @@ const int size = 32;
 typedef int block;
 
 class Layer;
+class Model;
 
 class Container
 {
@@ -16,6 +17,7 @@ protected:
     block *content;
 
     friend Layer;
+    friend Model;
 
 public:
     Container();
@@ -44,5 +46,5 @@ public:
     bool operator[](uint);
 
     Container &operator()(uint);
-    Container &operator=(Container &&) noexcept;
+    Container &operator=(Container &&);
 };

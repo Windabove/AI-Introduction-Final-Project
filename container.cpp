@@ -1,4 +1,5 @@
 #include "container.h"
+#include <iostream>
 
 inline uint offset(uint i)
 {
@@ -7,14 +8,15 @@ inline uint offset(uint i)
 
 Container::Container() {}
 
-Container::Container(uint _len) : len(_len), content(new block[_len])
+Container::Container(uint _len) : len(_len), content(new block[_len]) {}
+
+Container::Container(const Container &other) : len(other.len)
 {
-    clear();
-}
+    content = new block[len];
+    memcpy(content, other.content, len * sizeof(block));
+};
 
-Container::Container(const Container&other):len(other.len),content(other.content){};
-
-Container::Container(Container &&other) noexcept : len(other.len),content(other.content)
+Container::Container(Container &&other) noexcept : len(other.len), content(other.content)
 {
     other.content = nullptr;
 }
@@ -120,8 +122,17 @@ Container &Container::operator()(uint _len)
     return *this;
 }
 
-Container &Container::operator=(Container &&other) noexcept
+Container &Container::operator=(Container &&other)
 {
-    content = other.content;
-    return *this;
+    if (this == &other)
+    {
+        throw "Assignment to the same object is not allowed";
+    }
+    else
+    {
+        len = other.len;
+        content = other.content;
+        other.content = nullptr;
+        return *this;
+    }
 }
